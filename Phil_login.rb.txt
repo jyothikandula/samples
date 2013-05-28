@@ -1,0 +1,49 @@
+write tests and use the saucelabs config
+[3:24:58 PM] Phil Swenson: using code like this:
+[3:24:58 PM] Phil Swenson: @driver = Selenium::WebDriver.for(
+        :remote,
+        :url => "http://3rdrevolution:033dad4a-76a6-4c6d-8fdb-f4c48a6e5706@ondemand.saucelabs.com:80/wd/hub",
+        :desired_capabilities => caps)
+		
+=================================================		
+		
+Phils Example:
+require 'rubygems'
+require "test/unit"
+require 'selenium-webdriver'
+
+class ExampleTest < Test::Unit::TestCase
+  def setup
+    caps = Selenium::WebDriver::Remote::Capabilities.internet_explorer
+    caps.platform = 'Windows 7'
+    caps.version = '8'
+    caps[:name] = "Login"
+
+    @driver = Selenium::WebDriver.for(
+        :remote,
+        :url => "http://3rdrevolution:033dad4a-76a6-4c6d-8fdb-f4c48a6e5706@ondemand.saucelabs.com:80/wd/hub",
+        :desired_capabilities => caps)
+  end
+
+  def test_sauce
+    @driver.navigate.to "https://thirdrevolution-staging.herokuapp.com/"
+    @driver.find_element(:link, "Sign In").click
+    @driver.find_element(:id, "user_email").clear
+    @driver.find_element(:id, "user_email").send_keys "jyothi_kandula@yahoo.com"
+    @driver.find_element(:id, "user_password").clear
+    @driver.find_element(:id, "user_password").send_keys "jyothi"
+    @driver.find_element(:css, "#signin-body > form > input[name=\"commit\"]").click
+    @driver.find_element(:id, "q").clear
+    @driver.find_element(:id, "q").send_keys "quilt"
+    @driver.find_element(:name, "commit").click
+    assert_match("298 projects", @driver.find_element(:css, "BODY").text, "298 projects found is correct")
+    @driver.find_element(:link, "home").click
+    @driver.find_element(:link, "logout").click
+  end
+
+
+
+  def teardown
+    @driver.quit
+  end
+end
